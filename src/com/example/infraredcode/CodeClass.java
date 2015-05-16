@@ -1,0 +1,80 @@
+package com.example.infraredcode;
+import java.util.HashMap;
+import java.util.Map;
+
+import android.content.Context;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+
+
+public class CodeClass {  //注意这个不会对数据库操作
+	protected String CodeName;
+	protected String[] CodeValuename;//存储所有按钮的名称
+	protected static byte[] Codeheader={(byte) 0xAA,0X2};//这里是码头和码尾
+	private DBhelper mHelper;
+	protected int mID;
+	protected Map<String,byte[]> CodeValue=new HashMap<String,byte[]>();
+	private Context mContext;//传入context 帮助发消息用
+	protected CodeClass(Context ctx)
+	{
+		mContext=ctx;
+	}
+   protected CodeClass(Context ctx,String codeName,Map<String,byte[]> map,byte[] header)
+   {
+	   CodeName=codeName;
+	   init();//防止出项空指针异常
+	   CodeValue.putAll(map);
+	   Codeheader=header;
+	   mContext=ctx;
+   }     /*外包内的程序不能创建CodeClass，codeClass只能由CodeClassControl创建*/
+   protected CodeClass(Context ctx,String codeName,Map<String,byte[]> map)
+   {
+	   CodeName=codeName;
+	   init();//防止出项空指针异常
+	   CodeValue.putAll(map);
+	   mContext=ctx;
+   }     /*外包内的程序不能创建CodeClass，codeClass只能由CodeClassControl创建*/
+    public void SendData(String Codename)//将对应红外遥控的码值通过串口发送
+    {   
+    	Intent intent = new Intent(); 
+    	 intent.setAction("SEND"); 
+    	 intent.putExtra("data", CodeValue.get(Codename)); 
+    	 mContext.sendBroadcast(intent);  
+    }
+
+    public void WritetoDB()//职能分划明确只有在这会打开数据库，一般情况下不要打开数据库
+    {
+    
+    	 mHelper = new DBhelper(mContext); 
+    	  SQLiteDatabase db = mHelper.getWritableDatabase();
+    	  System.out.println("打开数据库");
+    	  /*这里写的有问题应该是自适应的*/
+    	   if(mHelper.isNotExist(db,CodeName))
+    	   {
+    		   System.out.println("进入数据库");
+    	   db.execSQL("insert into remote(NAME,PLAY,PRE,NEXT,VOLUME_UP,VOLUME_DOWN) values(?,?,?,?,?,?)", new Object[]  
+    		        { CodeName,codeMerger(CodeValue.get("PLAY")),codeMerger(CodeValue.get("PRE"))
+    			   ,codeMerger(CodeValue.get("NEXT")),codeMerger(CodeValue.get("VOLUME_UP")),codeMerger(CodeValue.get("VOLUME_DOWN")) });
+           db.close();
+    	   }
+    }
+    private void init()
+    {
+    	byte[] m=new byte[2];
+    	m[0]=-128;
+    	m[1]=-128;
+    	CodeValue.put("KEY",m);
+    	CodeValue.put("PLAY", m);
+    	CodeValue.put("PRE",m);
+    	CodeValue.put("NEXT",m);
+    	CodeValue.put("VOLUME_UP",m);
+    	CodeValue.put("VOLUME_DOWN",m);
+    }
+    public static byte[] codeMerger(byte[] byte_2){  //码头合并函数
+        byte[] byte_3 = new byte[Codeheader.length+byte_2.length];  
+        System.arraycopy(Codeheader, 0, byte_3, 0, Codeheader.length);  
+        System.arraycopy(byte_2, 0, byte_3, Codeheader.length, byte_2.length);     
+        return byte_3;  //添加码头
+    } 
+
+}
