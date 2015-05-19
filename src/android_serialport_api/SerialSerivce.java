@@ -4,9 +4,11 @@ package android_serialport_api;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.infraredcode.CodeClass;
 import com.example.remote.MainActivity;
 
 import android.app.Service;
@@ -27,7 +29,8 @@ public class SerialSerivce extends Service{
 	private SerialApplican mySerialApplican;
 	private final String tag="SerialPortserice";
 	private String label;
-	public byte ReadFlag=0;
+	public byte ReadComplete=0;//表示接收完毕
+	public byte ReadFlag=0;//readflag表示接收到fpga发送的码头命令
 	private Receivedhandler mhandler; 
 	public Map<String,byte[]> receiveCodevalue;
 	@Override  
@@ -118,24 +121,33 @@ public class SerialSerivce extends Service{
 	     }
 		@Override
 		public void handleMessage(Message msg) {//这个handle用来屏幕通知的更新和接收数据的收集
+			
+				switch (msg.what) {
+				case 0x10:
+					byte[] nee=(byte[]) msg.obj;
+					if (CodeClass.isReceiveRight(nee))
+						{ReadFlag=1;}
+					if(ReadFlag==1)
+					{
+				    receiveCodevalue.put(label, CodeClass.removeHeader(nee));
+				    ReadFlag=0;
+				    ReadComplete=1;
+					}
+					System.out.println(nee);
+					break;
+				case 0x11:
+			
+					break;
+				case 0x12:
+					
+					break;
 		
-			switch (msg.what) {
-			case 0x10:
-				byte[] nee=(byte[]) msg.obj;
-			    receiveCodevalue.put(label,nee);
-				ReadFlag=1;
-				System.out.println(nee);
-				break;
-			case 0x11:
-		
-				break;
-			case 0x12:
-				
-				break;
-	
-}
-}
+	  }
+	}
 	
 	
 }
+	 
+
+	 
 }

@@ -1,4 +1,5 @@
 package com.example.infraredcode;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +52,6 @@ public class CodeClass {  //注意这个不会对数据库操作
     	  /*这里写的有问题应该是自适应的*/
     	   if(mHelper.isNotExist(db,CodeName))
     	   {
-    		   System.out.println("进入数据库");
     	   db.execSQL("insert into remote(NAME,PLAY,PRE,NEXT,VOLUME_UP,VOLUME_DOWN) values(?,?,?,?,?,?)", new Object[]  
     		        { CodeName,codeMerger(CodeValue.get("PLAY")),codeMerger(CodeValue.get("PRE"))
     			   ,codeMerger(CodeValue.get("NEXT")),codeMerger(CodeValue.get("VOLUME_UP")),codeMerger(CodeValue.get("VOLUME_DOWN")) });
@@ -70,11 +70,28 @@ public class CodeClass {  //注意这个不会对数据库操作
     	CodeValue.put("VOLUME_UP",m);
     	CodeValue.put("VOLUME_DOWN",m);
     }
+    
+    //下面的三个函数分别可以实现，加码头，判断是否为接受码头，去码头，三个编码函数
     public static byte[] codeMerger(byte[] byte_2){  //码头合并函数
         byte[] byte_3 = new byte[Codeheader.length+byte_2.length];  
         System.arraycopy(Codeheader, 0, byte_3, 0, Codeheader.length);  
         System.arraycopy(byte_2, 0, byte_3, Codeheader.length, byte_2.length);     
         return byte_3;  //添加码头
-    } 
+    }
+	 public static boolean isReceiveRight(byte[] data)//判断接收的码头是否正常
+	 {
+		 int a=data.length;
+		 if((a>1)&(data[a-2]==(byte)0xAA)&(data[a-1]==(byte)0x08)){
+			 return true;
+		 }
+		 else{
+			 return false;
+		 }
+		 
+	 }
+	 public static byte[] removeHeader(byte[] data)//去掉码头
+	 {
+		return Arrays.copyOfRange(data,2,data.length);
+	 }
 
 }

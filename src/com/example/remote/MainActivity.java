@@ -97,7 +97,6 @@ public class MainActivity extends Activity {
         	
         	{
     	      NameSpinId=arg2+1;
-    	      System.out.println("选中的编码是");
     	      System.out.println(NameSpinId);
         	  MyCodeClass=MyControl.GetCodeclass(new Integer(NameSpinId));//此处获取通过ID获取用户选择的遥控器类
         	 arg0.setVisibility(View.VISIBLE);
@@ -106,7 +105,7 @@ public class MainActivity extends Activity {
 			@Override
               public void onNothingSelected(AdapterView<?> parent) {
 				// TODO Auto-generated method stub
-				//MyCodeClass=MyControl.GetNECCode();//如果什么都没选就是NEC编码
+				MyCodeClass=MyControl.GetNECCode();//如果什么都没选就是NEC编码
 			}
 	    });
 		
@@ -173,10 +172,10 @@ public class MainActivity extends Activity {
         {
           	public void onClick(View v){
           	
-          		if(WorkMode==1&&msgService.ReadFlag==1)
+          		if(WorkMode==1&&msgService.ReadComplete==1)
           		{
           	     WorkMode=0;//切换工作模式为发送模式
-          		msgService.Write(Command_recivecomplete);//为fpga写入命令停止接收
+          		   msgService.Write(Command_recivecomplete);//为fpga写入命令停止接收
                       newCodevalue=new HashMap<String,byte[]>();
                 	  newCodevalue=msgService.receiveCodevalue;
                 	  MyCodeClass1=MyControl.CreaeCodeClass(newCodename,newCodevalue,null);
