@@ -39,6 +39,8 @@ public class CodeClass {  //注意这个不会对数据库操作
     {   
     	Intent intent = new Intent(); 
     	 intent.setAction("SEND"); 
+    	 System.out.println("发送的数据是");
+    	 System.out.println( CodeValue.get(Codename));
     	 intent.putExtra("data", CodeValue.get(Codename)); 
     	 mContext.sendBroadcast(intent);  
     }

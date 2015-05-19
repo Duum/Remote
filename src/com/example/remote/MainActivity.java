@@ -67,8 +67,8 @@ public class MainActivity extends Activity {
 		
 		builder = new AlertDialog.Builder(this);//创建dialog的builder
 		MyControl=new CodeClassControl(this);
-		//MyCodeClass1=MyControl.GetNECCode();//
-		//MyCodeClass1.WritetoDB();
+		MyCodeClass1=MyControl.GetNECCode();//
+		MyCodeClass1.WritetoDB();
 		allCodeName=MyControl.getALLClassName();//获取所有的红外编码名称；	
 		
 		
@@ -96,19 +96,20 @@ public class MainActivity extends Activity {
        public void onItemSelected(AdapterView<?> arg0,View arg1,int arg2,long arg3)
         	
         	{
+    	   System.out.println("选中的条目是");
     	      NameSpinId=arg2+1;
-    	      System.out.println(NameSpinId);
-        	  MyCodeClass=MyControl.GetCodeclass(new Integer(NameSpinId));//此处获取通过ID获取用户选择的遥控器类
+        	  MyCodeClass=MyControl.GetCodeclass(allCodeName.get(arg2));//此处获取通过ID获取用户选择的遥控器类
         	 arg0.setVisibility(View.VISIBLE);
         	}
 
-			@Override
+		   	@Override
               public void onNothingSelected(AdapterView<?> parent) {
 				// TODO Auto-generated method stub
 				MyCodeClass=MyControl.GetNECCode();//如果什么都没选就是NEC编码
 			}
 	    });
-		
+	  
+	    System.out.println(NameSpinId);
 	    DelCode.setOnClickListener(new OnClickListener()
         {
           	public void onClick(View v){
@@ -121,8 +122,8 @@ public class MainActivity extends Activity {
           	          	     android.R.drawable.ic_dialog_info).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
           	                    public void onClick(DialogInterface dialog, int which) {
-          		MyControl.DelCodeClass(new Integer(NameSpinId));
-          		 allCodeName.remove(NameSpinId-1);
+				          		MyControl.DelCodeClass(new Integer(NameSpinId));
+				          		 allCodeName.remove(NameSpinId-1);
           	                    }}).setNegativeButton("取消", null).show(); 
           		}
           		
@@ -175,7 +176,7 @@ public class MainActivity extends Activity {
           		if(WorkMode==1&&msgService.ReadComplete==1)
           		{
           	     WorkMode=0;//切换工作模式为发送模式
-          		   msgService.Write(Command_recivecomplete);//为fpga写入命令停止接收
+          		    msgService.Write(Command_recivecomplete);//为fpga写入命令停止接收
                       newCodevalue=new HashMap<String,byte[]>();
                 	  newCodevalue=msgService.receiveCodevalue;
                 	  MyCodeClass1=MyControl.CreaeCodeClass(newCodename,newCodevalue,null);
@@ -196,7 +197,7 @@ public class MainActivity extends Activity {
           	}
           });
         
-		play.setOnClickListener(new OnClickListener(){
+play.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub

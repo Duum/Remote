@@ -38,8 +38,29 @@ public class CodeClassControl {
 	}
 	public CodeClass GetCodeclass(String CodeName){//通过遥控器名获得遥控器类
 		//mCodeClass=new CodeClass();
+		mCodeClass=new CodeClass(mContext2);
+		myDBhelper=new DBhelper(mContext2);
+		SQLiteDatabase db = myDBhelper.getReadableDatabase();  
 		
-		return mCodeClass;
+		 Cursor cursor = db.query("remote", new String[]  
+			        {"NAME","PLAY","PRE","NEXT","VOLUME_UP","VOLUME_DOWN" }, "NAME=?", new String[]  
+			        { CodeName }, null, null, null); 
+	       
+try{
+cursor.moveToFirst(); 
+	//mCodeClass.mID = cursor.getInt(cursor.getColumnIndex("ID"));  
+	mCodeClass.CodeName = cursor.getString(cursor.getColumnIndex("NAME")); 
+	 //mCodeClass.CodeValue.put("POWER",cursor.getString(cursor.getColumnIndex("POWER")));
+	 mCodeClass.CodeValue.put("PLAY",cursor.getBlob(cursor.getColumnIndex("PLAY")));
+	 mCodeClass.CodeValue.put("PRE",cursor.getBlob(cursor.getColumnIndex("PRE")));
+	 mCodeClass.CodeValue.put("NEXT",cursor.getBlob(cursor.getColumnIndex("NEXT")));
+	 mCodeClass.CodeValue.put("VOLUME_UP",cursor.getBlob(cursor.getColumnIndex("VOLUME_UP")));
+	 mCodeClass.CodeValue.put("VOLUME_DOWN",cursor.getBlob(cursor.getColumnIndex("VOLUME_DOWN")));}
+catch(Exception e){
+		
+	 }
+	 db.close();
+	return mCodeClass; 
 			                //从数据库中读取CodeName的表
 	}
 	public CodeClass GetCodeclass(Integer id){//通过ID获得遥控器类。
@@ -72,9 +93,17 @@ public class CodeClassControl {
 	{
 		myDBhelper=new DBhelper(mContext2);
 		SQLiteDatabase db = myDBhelper.getReadableDatabase();  
-		  db.execSQL("delete from remote where ID ="+ id.toString());
-		db.close();
-		
+		db.execSQL("delete from remote where ID ="+ id.toString());
+		db.execSQL("ALTER TABLE table AUTO_INCREMENT = 1");
+		db.close();	
+	}
+	public void delCodeclass(String codename)//删除某一条数据
+	{
+		myDBhelper=new DBhelper(mContext2);
+		SQLiteDatabase db = myDBhelper.getReadableDatabase();  
+		db.execSQL("delete from remote where NAME ="+codename);
+		db.execSQL("ALTER TABLE table AUTO_INCREMENT = 1");
+		db.close();	
 	}
 	public CodeClass CreaeCodeClass(String CodeName,Map<String,byte[]> map,byte[] header)
 	{
