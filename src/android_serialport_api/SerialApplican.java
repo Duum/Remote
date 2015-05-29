@@ -16,8 +16,9 @@ public class SerialApplican {
 	public String Receivelable;
 	public String mDataReceived;
 	private Receivedhandler myhandler;
-	public byte ReadFlag1=0;
-	 byte[] buffer;
+	protected ReadThread myReadThread;
+	byte ReadFlag1=0;
+	
 	 
 	
 	public SerialApplican(Receivedhandler mhandler,File device,int baudrate) throws SecurityException, IOException{
@@ -28,12 +29,36 @@ public class SerialApplican {
 		e.printStackTrace();
 		
 	   } 
+		
 		mInputStream=(FileInputStream) CodePort.getInputStream();
 		mOutputStream=(FileOutputStream) CodePort.getOutputStream();
 		myhandler=mhandler;
+
 		
 	}
-
+ private class ReadThread extends Thread{
+	 public void run()
+		  {		  
+					
+			  while(!interrupted()) {
+					int size;
+					try {
+						System.out.println(isInterrupted());
+						if (mInputStream == null) return;
+						size = mInputStream.available();
+						if (size > 0) {
+							byte[] buffer = new byte[size];
+							mInputStream.read(buffer);
+							sendReadData(buffer);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+						return;
+					}
+				}
+	 
+ }
+ }
 	public void Write(byte[] data) {
 		try {
 		mOutputStream.write(data);
@@ -51,38 +76,13 @@ public class SerialApplican {
 		
 	}
 	public void read() {
-	
-		  new Thread()//这是一个匿名类
-		  {
-			  @Override
-			public void run()
-			  {		  
-						
-				  while(!isInterrupted()) {
-						int size;
-						try {
-							byte[] buffer = new byte[300];
-							if (mInputStream == null) return;
-							size = mInputStream.read(buffer);
-							if (size > 0) {
-								sendReadData(onDataReceived(buffer, size));
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-							return;
-						}
-					}
-				
-					
-				
-			  }
-		  }.start();
-		  
-		  
-		  
-				/*size 为数组的长度*/
-			
+		myReadThread=new ReadThread();
+		myReadThread.start();
 		}
+	public void ReadStop(){
+		myReadThread.interrupt();
+		 System.out.println(myReadThread.isInterrupted());
+	}
 			
 		
 	
@@ -98,6 +98,7 @@ public class SerialApplican {
 	 System.arraycopy(bufer_a, 0,hehe, 0, isize);
 	 return hehe;
  }
+ 
 	protected  void sendReadData(byte[] data)
 	{
 		Message m0 = new Message();
@@ -113,6 +114,7 @@ public class SerialApplican {
 	m0.what=0x10;//0x10表示接收成功
 	myhandler.sendMessage(m0);
 	}
+
 	
 	
 }

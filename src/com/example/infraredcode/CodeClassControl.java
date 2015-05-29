@@ -36,7 +36,8 @@ public class CodeClassControl {
 		return allName;
 		
 	}
-	public CodeClass GetCodeclass(String CodeName){//通过遥控器名获得遥控器类
+	/*read a codeclass instance from DB by a exist codename */
+	public CodeClass GetCodeclass(String CodeName){
 		//mCodeClass=new CodeClass();
 		mCodeClass=new CodeClass(mContext2);
 		myDBhelper=new DBhelper(mContext2);
@@ -97,14 +98,7 @@ catch(Exception e){
 		db.execSQL("ALTER TABLE table AUTO_INCREMENT = 1");
 		db.close();	
 	}
-	public void delCodeclass(String codename)//删除某一条数据
-	{
-		myDBhelper=new DBhelper(mContext2);
-		SQLiteDatabase db = myDBhelper.getReadableDatabase();  
-		db.execSQL("delete from remote where NAME ="+codename);
-		db.execSQL("ALTER TABLE table AUTO_INCREMENT = 1");
-		db.close();	
-	}
+
 	public CodeClass CreaeCodeClass(String CodeName,Map<String,byte[]> map,byte[] header)
 	{
 		mCodeClass= new CodeClass(mContext2,CodeName,map,header);
@@ -119,6 +113,7 @@ catch(Exception e){
 	{
 		return mDefaultCode.getNecCode();
 	}
+	/*delete a codeclass data in  DB by ID */
 	public void DelCodeClass (Integer id){
 		myDBhelper=new DBhelper(mContext2);
 		SQLiteDatabase db = myDBhelper.getReadableDatabase();
@@ -126,6 +121,18 @@ catch(Exception e){
 	        { id.toString() });  
 	        db.close();
 	        
+	}
+	/*delete a codeclass data in  DB by codename */
+	public void DelCodeClass(String codename)//删除某一条数据
+	{
+		if(codename==null){
+			return;
+		}
+		myDBhelper=new DBhelper(mContext2);
+		SQLiteDatabase db = myDBhelper.getReadableDatabase();  
+		db.execSQL("delete from remote where NAME ='"+codename+"'");
+		//db.execSQL("ALTER TABLE table AUTO_INCREMENT = 1");
+		db.close();	
 	}
 
 }

@@ -93,6 +93,10 @@ public class SerialSerivce extends Service{
     private void read(){
     	 mySerialApplican.read();
     }
+   	public void stopRead(){
+    	 mySerialApplican.ReadStop();
+    	
+    }
     public void StopAll()
     {
     	
@@ -126,13 +130,16 @@ public class SerialSerivce extends Service{
 					byte[] nee=(byte[])msg.obj;
 					if(nee[0]==-86&&nee[1]==2)
 					{
+						ReadFlag=1;
 						System.out.println("fpga出现反应");
-					}else{
+					}else if(ReadFlag==1)
+					{
 						    ReadComplete=0;
 						    receiveCodevalue.put(label,nee);
 						    ReadComplete=1;
 						    Toast.makeText(SerialSerivce.this, label+"键,学习完毕",
 								     Toast.LENGTH_SHORT).show();	
+						    stopRead();
 					}
 					break;
 				case 0x11:

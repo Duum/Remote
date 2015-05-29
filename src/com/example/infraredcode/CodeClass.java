@@ -89,7 +89,6 @@ public class CodeClass {  //注意这个不会对数据库操作
     	if (Codeheader.length==0){
     		return null;
     	}
-    	System.out.println(Codeheader.length);
         byte[] byte_3 = new byte[Codeheader.length+byte_2.length];
         System.arraycopy(Codeheader, 0, byte_3, 0, Codeheader.length); 
         System.out.println(Codeheader.length);
