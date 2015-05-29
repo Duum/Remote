@@ -6,16 +6,17 @@ import java.util.Map;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 
 public class CodeClass {  //注意这个不会对数据库操作
 	protected String CodeName;
 	protected String[] CodeValuename;//存储所有按钮的名称
-	protected static byte[] Codeheader={(byte) 0xAA,0X2};//这里是码头和码尾
+	protected static byte[] Codeheader={(byte)0xAA,(byte)0x02};//这里是码头和码尾
 	private DBhelper mHelper;
 	protected int mID;
 	protected Map<String,byte[]> CodeValue=new HashMap<String,byte[]>();
-	private Context mContext;//传入context 帮助发消息用
+	private static Context mContext;//传入context 帮助发消息用
 	protected CodeClass(Context ctx)
 	{
 		mContext=ctx;
@@ -25,7 +26,7 @@ public class CodeClass {  //注意这个不会对数据库操作
 	   CodeName=codeName;
 	   init();//防止出项空指针异常
 	   CodeValue.putAll(map);
-	   Codeheader=header;
+	   //Codeheader=header;
 	   mContext=ctx;
    }     /*外包内的程序不能创建CodeClass，codeClass只能由CodeClassControl创建*/
    protected CodeClass(Context ctx,String codeName,Map<String,byte[]> map)
@@ -39,15 +40,11 @@ public class CodeClass {  //注意这个不会对数据库操作
     {   
     	Intent intent = new Intent(); 
     	 intent.setAction("SEND"); 
-    	 System.out.println("发送的数据是");
-    	 System.out.println( CodeValue.get(Codename));
     	 intent.putExtra("data", CodeValue.get(Codename)); 
     	 mContext.sendBroadcast(intent);  
     }
-
     public void WritetoDB()//职能分划明确只有在这会打开数据库，一般情况下不要打开数据库
     {
-    
     	 mHelper = new DBhelper(mContext); 
     	  SQLiteDatabase db = mHelper.getWritableDatabase();
     	  System.out.println("打开数据库");
@@ -60,11 +57,21 @@ public class CodeClass {  //注意这个不会对数据库操作
            db.close();
     	   }
     }
+    public static void ReceiveData(String Codename)
+    {
+    	 Intent intent = new Intent();
+  		 intent.setAction("RECRIVE");
+  		 intent.putExtra("data", Codename);//写入接收的字段
+  		 mContext.sendBroadcast(intent);
+  		Toast.makeText( mContext, "开始学习"+Codename+"键",
+ 			     Toast.LENGTH_SHORT).show();
+    }
     private void init()
     {
     	byte[] m=new byte[2];
     	m[0]=-128;
     	m[1]=-128;
+    	CodeValue.put("POWER",m);
     	CodeValue.put("KEY",m);
     	CodeValue.put("PLAY", m);
     	CodeValue.put("PRE",m);
@@ -74,11 +81,27 @@ public class CodeClass {  //注意这个不会对数据库操作
     }
     
     //下面的三个函数分别可以实现，加码头，判断是否为接受码头，去码头，三个编码函数
-    public static byte[] codeMerger(byte[] byte_2){  //码头合并函数
-        byte[] byte_3 = new byte[Codeheader.length+byte_2.length];  
-        System.arraycopy(Codeheader, 0, byte_3, 0, Codeheader.length);  
-        System.arraycopy(byte_2, 0, byte_3, Codeheader.length, byte_2.length);     
+    public static byte[] codeMerger(byte[] byte_2){//码头合并函数
+    	if (byte_2.length==0)
+    	{
+    		return null;
+    		}
+    	if (Codeheader.length==0){
+    		return null;
+    	}
+    	System.out.println(Codeheader.length);
+        byte[] byte_3 = new byte[Codeheader.length+byte_2.length];
+        System.arraycopy(Codeheader, 0, byte_3, 0, Codeheader.length); 
+        System.out.println(Codeheader.length);
+        System.arraycopy(byte_2, 0, byte_3, Codeheader.length, byte_2.length); 
+        for(int i=0;i<byte_3.length;i++){
+        if(byte_3[i]<0){
+        	byte_3[i]=(byte) (byte_3[i]+256);
+           }
+        }
+    	
         return byte_3;  //添加码头
+        
     }
 	 public static boolean isReceiveRight(byte[] data)//判断接收的码头是否正常
 	 {

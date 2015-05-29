@@ -92,14 +92,14 @@
                 android:id="@+id/play"
                 android:layout_width="65dip"
                 android:layout_height="65dip"
-                android:layout_alignLeft="@+id/apple_volup"
+                android:layout_alignLeft="@+id/volup"
                 android:layout_below="@+id/volume_add"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="10dip"
                 android:background="@drawable/center" />
 
             <ImageButton
-                android:id="@+id/apple_prev"
+                android:id="@+id/prev"
                 android:layout_width="65dip"
                 android:layout_height="65dip"
                 android:layout_alignLeft="@+id/cli1"
@@ -108,7 +108,7 @@
                 android:background="@drawable/prev" />
 
             <ImageButton
-                android:id="@+id/apple_next"
+                android:id="@+id/next"
                 android:layout_width="65dip"
                 android:layout_height="65dip"
                 android:layout_alignRight="@+id/cli2"

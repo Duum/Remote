@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 import android.os.Message;
 import android_serialport_api.SerialSerivce.Receivedhandler;
@@ -14,8 +16,9 @@ public class SerialApplican {
 	public String Receivelable;
 	public String mDataReceived;
 	private Receivedhandler myhandler;
-	public byte ReadFlag1;
+	public byte ReadFlag1=0;
 	 byte[] buffer;
+	 
 	
 	public SerialApplican(Receivedhandler mhandler,File device,int baudrate) throws SecurityException, IOException{
 		try {
@@ -48,39 +51,30 @@ public class SerialApplican {
 		
 	}
 	public void read() {
-		System.out.println("已经开始读了");
+	
 		  new Thread()//这是一个匿名类
 		  {
 			  @Override
 			public void run()
-			  {
-				  
-				  int size=0;
-				  while (size == 0) {
-					  System.out.println("为什么会空指针呢");
-		
+			  {		  
+						
+				  while(!isInterrupted()) {
+						int size;
 						try {
-							size = mInputStream.available();
+							byte[] buffer = new byte[300];
+							if (mInputStream == null) return;
+							size = mInputStream.read(buffer);
+							if (size > 0) {
+								sendReadData(onDataReceived(buffer, size));
+							}
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							return;
 						}
+					}
+				
 					
-				}
-				buffer = new byte[size];
-				for(int i=0;i<buffer.length;i++){
-					   System.out.println(buffer[i]);
-					  }
-				try {
-					mInputStream.read(buffer);
-					Message m0 = new Message();
-					m0.obj=buffer;//这里里面装的是接收的数据
-					m0.what=0x10;//0x10表示接收成功
-					myhandler.sendMessage(m0);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				
 			  }
 		  }.start();
 		  
@@ -98,5 +92,27 @@ public class SerialApplican {
 			CodePort= null;
 		}
 	}
+ protected byte[] onDataReceived (byte[]bufer_a, int isize)
+ {  
+	 byte [] hehe=new byte[isize];
+	 System.arraycopy(bufer_a, 0,hehe, 0, isize);
+	 return hehe;
+ }
+	protected  void sendReadData(byte[] data)
+	{
+		Message m0 = new Message();
+		
+    	for(int i=0;i<data.length;i++){
+         if (data[i]<0){
+        	 data[i]=(byte) (data[i]+256);
+         }
+    		
+    		System.out.println(Integer.toHexString(data[i]) );
+		  }
+	m0.obj=data;//这里里面装的是接收的数据
+	m0.what=0x10;//0x10表示接收成功
+	myhandler.sendMessage(m0);
+	}
+	
 	
 }

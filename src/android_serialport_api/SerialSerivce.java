@@ -3,13 +3,10 @@ package android_serialport_api;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.example.infraredcode.CodeClass;
-import com.example.remote.MainActivity;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -17,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -42,7 +38,7 @@ public class SerialSerivce extends Service{
 		filter.addAction("RECRIVE");//准备接收
 		filter.addAction("RECRIVECOMPELETE");//接收完毕
 		registerReceiver(ControlReceiver, filter);
-		mhandler =new Receivedhandler(Looper.myLooper());
+		mhandler =new Receivedhandler(Looper.myLooper());	
 		
 	}
 	@Override  
@@ -64,10 +60,11 @@ public class SerialSerivce extends Service{
 		public void onReceive(Context context, Intent intent) {  
 		String Action = intent.getAction();
 		if(Action.equals("SEND")){
-			System.out.println("接收到广播");
 			byte[] sValue = intent.getByteArrayExtra("data");
-			System.out.println("接收到数据");
-			System.out.println(sValue[0]);
+			for(int i=0;i<sValue.length;i++)
+			{
+				System.out.println(Integer.toHexString(sValue[i]) );
+			}
 				Write(sValue);
 		}
 		else if(Action.equals("RECRIVE")){
@@ -75,6 +72,7 @@ public class SerialSerivce extends Service{
 			label = intent.getStringExtra("data");//获取接收键值
 			receiveCodevalue=new HashMap<String,byte[]>();
 			read();
+			
 						 		}
 		else if(Action.equals("RECRIVECOMPELETE"))
 		{
@@ -88,6 +86,7 @@ public class SerialSerivce extends Service{
 	
 
 	public  void Write(byte[] comand){
+	
 	
 		mySerialApplican.Write(comand);
 	}
@@ -124,16 +123,17 @@ public class SerialSerivce extends Service{
 			
 				switch (msg.what) {
 				case 0x10:
-					byte[] nee=(byte[]) msg.obj;
-					if (CodeClass.isReceiveRight(nee))
-						{ReadFlag=1;}
-					if(ReadFlag==1)
+					byte[] nee=(byte[])msg.obj;
+					if(nee[0]==-86&&nee[1]==2)
 					{
-				    receiveCodevalue.put(label, CodeClass.removeHeader(nee));
-				    ReadFlag=0;
-				    ReadComplete=1;
+						System.out.println("fpga出现反应");
+					}else{
+						    ReadComplete=0;
+						    receiveCodevalue.put(label,nee);
+						    ReadComplete=1;
+						    Toast.makeText(SerialSerivce.this, label+"键,学习完毕",
+								     Toast.LENGTH_SHORT).show();	
 					}
-					System.out.println(nee);
 					break;
 				case 0x11:
 			
