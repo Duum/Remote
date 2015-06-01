@@ -37,12 +37,12 @@ public CodeClass getNecCode(){
 		
 			CodeValue.put("VOLUME_UP",converse(hifi_vup));
 			CodeValue.put("VOLUME_DOWN",converse(hifi_vdn));
-			CodeValue.put("hifi_mute",converse(hifi_mute));
+			CodeValue.put("MUTE",converse(hifi_mute));
 			CodeValue.put("NEXT",converse(hifi_next));
 			CodeValue.put("PLAY",converse(hifi_play));
 			CodeValue.put("PRE",converse(hifi_prev));
-			CodeValue.put("hifi_cli1",converse(hifi_cli1));
-			CodeValue.put("hifi_cli2",converse(hifi_cli2));
+			CodeValue.put("NUM1",converse(hifi_cli1));
+			CodeValue.put("NUM2",converse(hifi_cli2));
 	}
 	
 	
@@ -54,9 +54,7 @@ public CodeClass getNecCode(){
          {
              	if(data[i]<0)
              	{
-             		System.out.println("数据转换");
              		buffer1[i]=(byte)(256+data[i]);//byte第一位是符号位
-             		System.out.println(buffer1[i]);
              	}
              	else
              		buffer1[i]=(byte) (data[i]);

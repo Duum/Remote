@@ -1,4 +1,4 @@
-package android_serialport_api;
+package infraredCodeSerivce;
 
 
 import java.io.File;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.infraredcode.CodeClass;
+import com.example.remote.MainActivity;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -20,6 +21,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+import android_serialport_api.SerialApplican;
 
 public class SerialSerivce extends Service{
 	private SerialApplican mySerialApplican;
@@ -28,7 +30,8 @@ public class SerialSerivce extends Service{
 	public byte ReadComplete=0;//表示接收完毕
 	public byte ReadFlag=0;//readflag表示接收到fpga发送的码头命令
 	private Receivedhandler mhandler; 
-	public Map<String,byte[]> receiveCodevalue;
+	private final byte[] Command_receive={(byte)0xAA,(byte)0x04,(byte)0x00,(byte)0x00};
+	private final byte[] Command_recivecomplete={(byte)0xAA,(byte)0x88,(byte)0x00,(byte)0x00};
 	@Override  
     public void onCreate() {  
         Log.i(tag, "ExampleService-onCreate");  
@@ -36,10 +39,9 @@ public class SerialSerivce extends Service{
 		IntentFilter filter = new IntentFilter();    
 		filter.addAction("SEND");
 		filter.addAction("RECRIVE");//准备接收
-		filter.addAction("RECRIVECOMPELETE");//接收完毕
+		filter.addAction("INTERRUPT");
 		registerReceiver(ControlReceiver, filter);
-		mhandler =new Receivedhandler(Looper.myLooper());	
-		
+		mhandler =new Receivedhandler(Looper.myLooper());
 	}
 	@Override  
 	   public void onStart(Intent intent, int startId) { 
@@ -48,7 +50,7 @@ public class SerialSerivce extends Service{
 		System.out.println(baudrate);
 		try {
 			mySerialApplican=new SerialApplican(mhandler,new File(device),baudrate);}
- 	catch(SecurityException | IOException e){
+ 	  catch(SecurityException | IOException e){
 		
 	}
 	
@@ -61,6 +63,7 @@ public class SerialSerivce extends Service{
 		String Action = intent.getAction();
 		if(Action.equals("SEND")){
 			byte[] sValue = intent.getByteArrayExtra("data");
+			System.out.println(sValue.length);
 			for(int i=0;i<sValue.length;i++)
 			{
 				System.out.println(Integer.toHexString(sValue[i]) );
@@ -70,14 +73,14 @@ public class SerialSerivce extends Service{
 		else if(Action.equals("RECRIVE")){
 			ReadFlag=0;
 			label = intent.getStringExtra("data");//获取接收键值
-			receiveCodevalue=new HashMap<String,byte[]>();
+			Write(Command_receive);
 			read();
 			
 						 		}
-		else if(Action.equals("RECRIVECOMPELETE"))
+		else if(Action.equals("INTERRUPT"))
 		{
-			
-			
+			System.out.println("出现错误");
+			Write(Command_recivecomplete);
 		}
 		 Log.i(tag,"intent" + intent); 
 		
@@ -128,26 +131,37 @@ public class SerialSerivce extends Service{
 				switch (msg.what) {
 				case 0x10:
 					byte[] nee=(byte[])msg.obj;
-					if(nee[0]==-86&&nee[1]==2)
+					if(nee[0]==(byte)0xAA&&nee[1]==(byte)0x08)
 					{
 						ReadFlag=1;
+						Intent intent = new Intent(); 
+				    	 intent.setAction("RECRIVE_ENABLE"); 
+				    	 sendBroadcast(intent);  
 						System.out.println("fpga出现反应");
 					}else if(ReadFlag==1)
 					{
-						    ReadComplete=0;
-						    receiveCodevalue.put(label,nee);
+						   if (CodeClass.isReceiveRight(nee))
+						   {
+						    System.out.println(label);
 						    ReadComplete=1;
-						    Toast.makeText(SerialSerivce.this, label+"键,学习完毕",
-								     Toast.LENGTH_SHORT).show();	
+						    ReadFlag=0;
+						    Write(Command_recivecomplete);
 						    stopRead();
+						    Intent intent = new Intent(); 
+					    	 intent.setAction("RECRIVECOMPELETE"); 
+					    	 intent.putExtra("codename", label);
+					    	 intent.putExtra("codevalue",nee);
+					    	 sendBroadcast(intent);  
+						   }else{
+							   Toast.makeText(SerialSerivce.this, "解码出现错误请重试",
+				              			 Toast.LENGTH_LONG).show();
+							   Write(Command_receive);
+
+						   }
+						    
 					}
 					break;
-				case 0x11:
-			
-					break;
-				case 0x12:
-					
-					break;
+				
 		
 	  }
 	}

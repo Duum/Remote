@@ -3,9 +3,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.view.Gravity;
 import android.widget.Toast;
 
 
@@ -24,38 +26,50 @@ public class CodeClass {  //注意这个不会对数据库操作
    protected CodeClass(Context ctx,String codeName,Map<String,byte[]> map,byte[] header)
    {
 	   CodeName=codeName;
-	   init();//防止出项空指针异常
 	   CodeValue.putAll(map);
-	   //Codeheader=header;
 	   mContext=ctx;
    }     /*外包内的程序不能创建CodeClass，codeClass只能由CodeClassControl创建*/
    protected CodeClass(Context ctx,String codeName,Map<String,byte[]> map)
    {
 	   CodeName=codeName;
-	   init();//防止出项空指针异常
 	   CodeValue.putAll(map);
 	   mContext=ctx;
    }     /*外包内的程序不能创建CodeClass，codeClass只能由CodeClassControl创建*/
+
     public void SendData(String Codename)//将对应红外遥控的码值通过串口发送
     {   
+    	
+    		if(CodeValue.get(Codename)==null)
+    				{
+    			Toast.makeText(mContext,"这个按键尚未学习",
+       			     Toast.LENGTH_SHORT).show();
+       		return;
+    				}
+       
+    		
     	Intent intent = new Intent(); 
     	 intent.setAction("SEND"); 
-    	 intent.putExtra("data", CodeValue.get(Codename)); 
+    	 intent.putExtra("data",codeMerger(CodeValue.get(Codename))); 
     	 mContext.sendBroadcast(intent);  
     }
-    public void WritetoDB()//职能分划明确只有在这会打开数据库，一般情况下不要打开数据库
-    {
+
+    public void  CommitDB(){
     	 mHelper = new DBhelper(mContext); 
-    	  SQLiteDatabase db = mHelper.getWritableDatabase();
-    	  System.out.println("打开数据库");
-    	  /*这里写的有问题应该是自适应的*/
-    	   if(mHelper.isNotExist(db,CodeName))
-    	   {
-    	   db.execSQL("insert into remote(NAME,PLAY,PRE,NEXT,VOLUME_UP,VOLUME_DOWN) values(?,?,?,?,?,?)", new Object[]  
-    		        { CodeName,codeMerger(CodeValue.get("PLAY")),codeMerger(CodeValue.get("PRE"))
-    			   ,codeMerger(CodeValue.get("NEXT")),codeMerger(CodeValue.get("VOLUME_UP")),codeMerger(CodeValue.get("VOLUME_DOWN")) });
-           db.close();
-    	   }
+   	  SQLiteDatabase db = mHelper.getWritableDatabase();
+   	 ContentValues cv = new ContentValues();  
+   	for (String key : CodeValue.keySet()) {
+   		cv.put(key, CodeValue.get(key));
+   	}
+    if(mHelper.isNotExist(db,CodeName))
+	   {
+    	cv.put("NAME",CodeName);
+    	db.insert("remote","NAME", cv);
+	   }
+    else
+    {
+    	   db.update("remote", cv, "NAME=?",new String[]{ CodeName});
+   	  }
+    db.close();
     }
     public static void ReceiveData(String Codename)
     {
@@ -63,23 +77,12 @@ public class CodeClass {  //注意这个不会对数据库操作
   		 intent.setAction("RECRIVE");
   		 intent.putExtra("data", Codename);//写入接收的字段
   		 mContext.sendBroadcast(intent);
-  		Toast.makeText( mContext, "开始学习"+Codename+"键",
- 			     Toast.LENGTH_SHORT).show();
+  		
+  		Toast toast=Toast.makeText( mContext, "开始学习"+Codename+"键",
+ 			     Toast.LENGTH_SHORT);
+  		toast.setGravity(Gravity.TOP, 0, 0);
+  		toast.show();
     }
-    private void init()
-    {
-    	byte[] m=new byte[2];
-    	m[0]=-128;
-    	m[1]=-128;
-    	CodeValue.put("POWER",m);
-    	CodeValue.put("KEY",m);
-    	CodeValue.put("PLAY", m);
-    	CodeValue.put("PRE",m);
-    	CodeValue.put("NEXT",m);
-    	CodeValue.put("VOLUME_UP",m);
-    	CodeValue.put("VOLUME_DOWN",m);
-    }
-    
     //下面的三个函数分别可以实现，加码头，判断是否为接受码头，去码头，三个编码函数
     public static byte[] codeMerger(byte[] byte_2){//码头合并函数
     	if (byte_2.length==0)
@@ -91,7 +94,6 @@ public class CodeClass {  //注意这个不会对数据库操作
     	}
         byte[] byte_3 = new byte[Codeheader.length+byte_2.length];
         System.arraycopy(Codeheader, 0, byte_3, 0, Codeheader.length); 
-        System.out.println(Codeheader.length);
         System.arraycopy(byte_2, 0, byte_3, Codeheader.length, byte_2.length); 
         for(int i=0;i<byte_3.length;i++){
         if(byte_3[i]<0){
@@ -104,14 +106,18 @@ public class CodeClass {  //注意这个不会对数据库操作
     }
 	 public static boolean isReceiveRight(byte[] data)//判断接收的码头是否正常
 	 {
-		 int a=data.length;
-		 if((a>1)&(data[a-2]==(byte)0xAA)&(data[a-1]==(byte)0x08)){
-			 return true;
-		 }
-		 else{
-			 return false;
-		 }
-		 
+		 int a=(int)(data[0]+16*16*data[1]+8);
+		 if (a<0){
+			 a=256+a;
+		 }			
+		if(data.length==a)
+			{
+			return true;
+			}else{
+	
+			return false;
+			}
+		
 	 }
 	 public static byte[] removeHeader(byte[] data)//去掉码头
 	 {

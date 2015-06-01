@@ -1,14 +1,13 @@
 package android_serialport_api;
 
+import infraredCodeSerivce.SerialSerivce.Receivedhandler;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 
 import android.os.Message;
-import android_serialport_api.SerialSerivce.Receivedhandler;
 public class SerialApplican {
 	private SerialPort CodePort=null;
 	private FileInputStream mInputStream;
@@ -18,10 +17,7 @@ public class SerialApplican {
 	private Receivedhandler myhandler;
 	protected ReadThread myReadThread;
 	byte ReadFlag1=0;
-	
-	 
-	
-	public SerialApplican(Receivedhandler mhandler,File device,int baudrate) throws SecurityException, IOException{
+public SerialApplican(Receivedhandler mhandler,File device,int baudrate) throws SecurityException, IOException{
 		try {
 		CodePort=new SerialPort(device,baudrate,0);
      	} catch (SecurityException | IOException e) {
@@ -32,26 +28,22 @@ public class SerialApplican {
 		
 		mInputStream=(FileInputStream) CodePort.getInputStream();
 		mOutputStream=(FileOutputStream) CodePort.getOutputStream();
-		myhandler=mhandler;
-
-		
+		myhandler=mhandler;		
 	}
  private class ReadThread extends Thread{
 	 public void run()
-		  {		  
-					
+		  {		
 			  while(!interrupted()) {
-					int size;
+				  int size;
 					try {
-						System.out.println(isInterrupted());
-						if (mInputStream == null) return;
-						size = mInputStream.available();
-						if (size > 0) {
-							byte[] buffer = new byte[size];
-							mInputStream.read(buffer);
-							sendReadData(buffer);
+							byte[] buffer = new byte[400];
+							if (mInputStream == null) return;
+							size = mInputStream.read(buffer);
+							if (size > 0) {
+								sendReadData(onDataReceived(buffer, size));
+							}
 						}
-					} catch (IOException e) {
+					catch (IOException e) {
 						e.printStackTrace();
 						return;
 					}
@@ -82,10 +74,7 @@ public class SerialApplican {
 	public void ReadStop(){
 		myReadThread.interrupt();
 		 System.out.println(myReadThread.isInterrupted());
-	}
-			
-		
-	
+	}	
 	public void closeSerialPort() {//关闭串口的操作
 		if (CodePort != null) {
 			CodePort.close();
@@ -105,10 +94,10 @@ public class SerialApplican {
 		
     	for(int i=0;i<data.length;i++){
          if (data[i]<0){
-        	 data[i]=(byte) (data[i]+256);
+        	 data[i]=(byte)(data[i]+256);
          }
     		
-    		System.out.println(Integer.toHexString(data[i]) );
+   System.out.println(Integer.toHexString(data[i]) );
 		  }
 	m0.obj=data;//这里里面装的是接收的数据
 	m0.what=0x10;//0x10表示接收成功

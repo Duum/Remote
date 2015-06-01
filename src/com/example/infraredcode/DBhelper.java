@@ -29,7 +29,8 @@ public class DBhelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)  
     {  
         //执行有更新行为的sql语句  
-        db.execSQL("CREATE Table remote (ID integer primary key autoincrement,NAME varchar(20),POWER BLOB,PLAY BLOB,PRE BLOB,NEXT BLOB,VOLUME_DOWN BLOB,VOLUME_UP BLOB,UNIQUE(NAME))");  
+ 
+        db.execSQL("CREATE Table remote (ID integer primary key autoincrement,NAME varchar(20),TYPE varchar(20),NUM1 BLOB,PAUSE BLOB,LIKE BLOB,SINALSOURCE BLOB,SLEEP BLOB,MENU BLOB,MUTE BLOB,NUM2 BLOB,NUM3 BLOB,NUM4 BLOB,NUM5 BLOB,NUM6 BLOB,NUM7 BLOB,NUM9 BLOB,NUM0 BLOB,OK BLOB,POWER BLOB,PLAY BLOB,PRE BLOB,NEXT BLOB,VOLUME_DOWN BLOB,VOLUME_UP BLOB,UNIQUE(NAME))");  
     }  
   
     /**数据库版本发生改变时才会被调用,数据库在升级时才会被调用;  
@@ -48,8 +49,17 @@ public class DBhelper extends SQLiteOpenHelper
     		  if(cursor.moveToFirst()==false){
     			  return true;
     		  };
-    	        result = (!cursor.getString(cursor.getColumnIndex("NAME")).equals(Codename) );
-    	 return result;
+    		  while(cursor.moveToNext())
+    		  {
+    			  System.out.println(cursor.getString(cursor.getColumnIndex("NAME")));
+    	        result = (cursor.getString(cursor.getColumnIndex("NAME")).equals(Codename) );
+    	        if(result==true)
+    	        {
+    	        	break;
+    	        	}
+    	        
+    		  }
+    	 return !result;
     }
     
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)  

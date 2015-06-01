@@ -15,6 +15,7 @@ public class CodeClassControl {
     private Context mContext2;
     private DBhelper myDBhelper;
     private ArrayList<String> allName;
+    private  String[] allCodeName={"NUM1","PAUSE","LIKE" ,"SINALSOURCE" ,"SLEEP","MENU","MUTE","NUM2","NUM3","NUM4","NUM5","NUM6","NUM7","NUM9","NUM0","OK","POWER","PLAY","PRE","NEXT","VOLUME_DOWN","VOLUME_UP" };
 	public CodeClassControl(Context ctx){
 		mContext2=ctx;
 		mDefaultCode=new DefalutCode(mContext2);	
@@ -43,25 +44,23 @@ public class CodeClassControl {
 		myDBhelper=new DBhelper(mContext2);
 		SQLiteDatabase db = myDBhelper.getReadableDatabase();  
 		
-		 Cursor cursor = db.query("remote", new String[]  
-			        {"NAME","PLAY","PRE","NEXT","VOLUME_UP","VOLUME_DOWN" }, "NAME=?", new String[]  
+		 Cursor cursor = db.query("remote",allCodeName,"NAME=?", new String[]  
 			        { CodeName }, null, null, null); 
 	       
-try{
-cursor.moveToFirst(); 
-	//mCodeClass.mID = cursor.getInt(cursor.getColumnIndex("ID"));  
-	mCodeClass.CodeName = cursor.getString(cursor.getColumnIndex("NAME")); 
-	 //mCodeClass.CodeValue.put("POWER",cursor.getString(cursor.getColumnIndex("POWER")));
-	 mCodeClass.CodeValue.put("PLAY",cursor.getBlob(cursor.getColumnIndex("PLAY")));
-	 mCodeClass.CodeValue.put("PRE",cursor.getBlob(cursor.getColumnIndex("PRE")));
-	 mCodeClass.CodeValue.put("NEXT",cursor.getBlob(cursor.getColumnIndex("NEXT")));
-	 mCodeClass.CodeValue.put("VOLUME_UP",cursor.getBlob(cursor.getColumnIndex("VOLUME_UP")));
-	 mCodeClass.CodeValue.put("VOLUME_DOWN",cursor.getBlob(cursor.getColumnIndex("VOLUME_DOWN")));}
-catch(Exception e){
-		
-	 }
-	 db.close();
-	return mCodeClass; 
+			try{
+			    cursor.moveToFirst(); 
+				//mCodeClass.mID = cursor.getInt(cursor.getColumnIndex("ID"));  
+				mCodeClass.CodeName = CodeName;
+				for (int i=0;i<allCodeName.length;i++)
+				{
+				 mCodeClass.CodeValue.put(allCodeName[i],cursor.getBlob(cursor.getColumnIndex(allCodeName[i])));
+				}
+			}
+			catch(Exception e){
+					
+				 }
+				 db.close();
+				return mCodeClass; 
 			                //从数据库中读取CodeName的表
 	}
 	public CodeClass GetCodeclass(Integer id){//通过ID获得遥控器类。
@@ -69,20 +68,18 @@ catch(Exception e){
 		myDBhelper=new DBhelper(mContext2);
 		SQLiteDatabase db = myDBhelper.getReadableDatabase();  
 		
-		 Cursor cursor = db.query("remote", new String[]  
-			        {"NAME","PLAY","PRE","NEXT","VOLUME_UP","VOLUME_DOWN" }, "ID=?", new String[]  
+		 Cursor cursor = db.query("remote",allCodeName, "ID=?", new String[]  
 			        { id.toString() }, null, null, null);  
 			       
 		 try{
 		 cursor.moveToFirst(); 
 			//mCodeClass.mID = cursor.getInt(cursor.getColumnIndex("ID"));  
 			mCodeClass.CodeName = cursor.getString(cursor.getColumnIndex("NAME")); 
-			 //mCodeClass.CodeValue.put("POWER",cursor.getString(cursor.getColumnIndex("POWER")));
-			 mCodeClass.CodeValue.put("PLAY",cursor.getBlob(cursor.getColumnIndex("PLAY")));
-			 mCodeClass.CodeValue.put("PRE",cursor.getBlob(cursor.getColumnIndex("PRE")));
-			 mCodeClass.CodeValue.put("NEXT",cursor.getBlob(cursor.getColumnIndex("NEXT")));
-			 mCodeClass.CodeValue.put("VOLUME_UP",cursor.getBlob(cursor.getColumnIndex("VOLUME_UP")));
-			 mCodeClass.CodeValue.put("VOLUME_DOWN",cursor.getBlob(cursor.getColumnIndex("VOLUME_DOWN")));}
+			for (int i=0;i<allCodeName.length;i++)
+			{
+			 mCodeClass.CodeValue.put(allCodeName[i],cursor.getBlob(cursor.getColumnIndex(allCodeName[i])));
+			}
+		 }
 		 catch(Exception e){
 				
 			 }

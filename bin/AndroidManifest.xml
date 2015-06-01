@@ -24,7 +24,7 @@
 	            <category android:name="android.intent.category.LAUNCHER" />
 	        </intent-filter>
 	    </activity>
-	    <service android:name="android_serialport_api.SerialSerivce"></service>
+	    <service android:name="infraredCodeSerivce.SerialSerivce"></service>
   
     </application>
     

@@ -6,7 +6,6 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:scrollbars="vertical" >
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -16,7 +15,6 @@
             android:layout_width="fill_parent"
             android:layout_height="60dip"
             android:orientation="horizontal" >
-
             <TextView
                 android:id="@+id/clientServersText"
                 android:layout_width="120dip"
@@ -24,12 +22,10 @@
                 android:layout_marginTop="10dip"
                 android:textSize="20sp" >
             </TextView>
-
             <LinearLayout
                 android:layout_width="120dip"
                 android:layout_height="fill_parent"
                 android:orientation="vertical" >
-
                 <TextView
                     android:id="@+id/protoltext"
                     android:layout_width="fill_parent"
@@ -38,19 +34,22 @@
                     android:text="选择编码"
                     android:textSize="15sp" >
                 </TextView>
-
                 <Spinner
                     android:id="@+id/nameSpin"
                     android:layout_width="fill_parent"
                     android:layout_height="40dip" >
                 </Spinner>
             </LinearLayout>
+            <TextView
+                android:id="@+id/prompt"
+                android:layout_width="fill_parent"
+                android:layout_height="40dip" >
+                </TextView>
         </LinearLayout>
-
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonfield">"
             <ImageButton
                 android:id="@+id/power"
                 android:layout_width="40dip"
@@ -60,7 +59,6 @@
                 android:layout_marginLeft="40dip"
                 android:layout_marginTop="20dip"
                 android:background="@drawable/power" />
-
             <ImageButton
                 android:id="@+id/cli1"
                 android:layout_width="40dip"
@@ -70,7 +68,6 @@
                 android:layout_marginLeft="40dip"
                 android:layout_marginTop="10dip"
                 android:background="@drawable/cli1" />
-
             <ImageButton
                 android:id="@+id/cli2"
                 android:layout_width="40dip"
@@ -137,20 +134,26 @@
               android:layout_height="wrap_content"
               android:layout_marginLeft="20dp"
               android:id="@+id/study"
-             android:text="学习"/> 
-          <Button
+             android:text="学习"/>
+         <Button
              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_toRightOf="@id/study"
+              android:id="@+id/edit"
+             android:text="修改"/>  
+          <Button
+             android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_toRightOf="@id/edit"
               android:id="@+id/studyover"
-             android:text="学习完毕"/>  
+             android:text="完毕"/>  
 
              <Button
                  android:id="@+id/delete"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_toRightOf="@id/studyover"
-                 android:text="删除该编码" />
+                 android:text="删除编码" />
                            
         </RelativeLayout>
          </LinearLayout>
