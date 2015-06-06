@@ -153,8 +153,10 @@ public class SerialSerivce extends Service{
 					    	 intent.putExtra("codevalue",nee);
 					    	 sendBroadcast(intent);  
 						   }else{
-							   Toast.makeText(SerialSerivce.this, "解码出现错误请重试",
-				              			 Toast.LENGTH_LONG).show();
+							   Intent intent = new Intent(); 
+						    	 intent.setAction("RECRIVE_ERROR"); 
+						    	 sendBroadcast(intent);  
+							
 							   Write(Command_receive);
 
 						   }
@@ -165,7 +167,7 @@ public class SerialSerivce extends Service{
 		
 	  }
 	}
-	
+		
 	
 }
 	 

@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>This is a basic introduction &mdash; remoteproject 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="remoteproject 1.0 documentation" href="index.html" />
+    <link rel="next" title="This is a introduction of how to extend the app (add button)" href="extension.html" />
+    <link rel="prev" title="Welcome to remoteproject’s documentation!" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="extension.html" title="This is a introduction of how to extend the app (add button)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to remoteproject’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">remoteproject 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="this-is-a-basic-introduction">
+<h1>This is a basic introduction<a class="headerlink" href="#this-is-a-basic-introduction" title="Permalink to this headline">¶</a></h1>
+<p>The remote Android App  is a complement  demo of Cms remote IR Remote Controller.It&#8217;s extensible and convenient. User can directly use it for  most scenes,but we also  provide APIs for user to develope  some special remote or just use Android device‘s UART.
+this page will show the  App&#8217;s class diagram and work flow.</p>
+<div class="section" id="class-diagram">
+<h2>Class diagram<a class="headerlink" href="#class-diagram" title="Permalink to this headline">¶</a></h2>
+<p>There are three java packages in the demo:<em>android_serialport_api</em>, <em>infraredcode</em>, <em>infraredCodeSerivce</em>. <em>android_serialport_api</em> is a set of classes about serialport, <em>infraredcode</em> is a set of classes about infraredcode,and <em>infraredCodeSerivce</em> include a  serivce to operate Communication between CodeClass and Serialport. In these Classes, the <strong>CodeClass</strong> is the core class, It&#8217;s a abstraction of reality remote which includes member variable <em>CodeName*s ,*CodeValue*s.It&#8217;s Member functions  *SendData(Codename)</em> will trigger SerialSerivce to Send byte[] to Fpga through serial port,and <em>CommitDB()</em> will wirte CodeClass to Sqltite.  <em>CodeClassControl</em> is a Class which can create <em>CodeClass</em>,delete <em>CodeClass</em> and get All CodeClasses name in the Sqltie.</p>
+<img alt="_images/Class.jpg" src="_images/Class.jpg" />
+<p>There are a few things to note</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>This app runs successfully in the android Development Board which mode is Intel Sharks Cove. So theoretically It can be compatible with all x86 and arm cpu.</li>
+<li>This app need root permission.</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="work-flow">
+<h2>Work flow<a class="headerlink" href="#work-flow" title="Permalink to this headline">¶</a></h2>
+<p id="tutorialr">this is the APP‘s MainActivity initialization process.If you want to modify this App deeply, you can refer to this process , if you just want to add some special button, or change the layout ,We recommend that you refer to the second <a href="#id1"><span class="problematic" id="id2">tutorial_</span></a>.</p>
+<img alt="_images/workflow.jpg" src="_images/workflow.jpg" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">This is a basic introduction</a><ul>
+<li><a class="reference internal" href="#class-diagram">Class diagram</a></li>
+<li><a class="reference internal" href="#work-flow">Work flow</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to remoteproject&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="extension.html"
+                        title="next chapter">This is a introduction of how to  extend the app (add button)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/base.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, dumiao.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/base.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

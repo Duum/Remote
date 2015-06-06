@@ -33,13 +33,23 @@ public SerialApplican(Receivedhandler mhandler,File device,int baudrate) throws 
  private class ReadThread extends Thread{
 	 public void run()
 		  {		
+		 super.run();
 			  while(!interrupted()) {
 				  int size;
 					try {
-							byte[] buffer = new byte[400];
-							if (mInputStream == null) return;
+							byte[] buffer = new byte[300];
+							if (mInputStream == null) 
+								return;
+							//size=mInputStream.available();
 							size = mInputStream.read(buffer);
-							if (size > 0) {
+							if (size > 0) { 
+								//byte[] buffer = new byte[size];
+								//mInputStream.read(buffer);
+                               for(int i=0;i<size;i++)
+                                 {
+								System.out.println(Integer.toHexString(buffer[i]) );
+                                 }
+                                // sendReadData(buffer);
 								sendReadData(onDataReceived(buffer, size));
 							}
 						}
@@ -97,8 +107,7 @@ public SerialApplican(Receivedhandler mhandler,File device,int baudrate) throws 
         	 data[i]=(byte)(data[i]+256);
          }
     		
-   System.out.println(Integer.toHexString(data[i]) );
-		  }
+   		  }
 	m0.obj=data;//这里里面装的是接收的数据
 	m0.what=0x10;//0x10表示接收成功
 	myhandler.sendMessage(m0);

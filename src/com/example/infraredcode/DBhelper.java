@@ -47,18 +47,20 @@ public class DBhelper extends SQLiteOpenHelper
     		  Cursor cursor = db.rawQuery( "SELECT * FROM " + "remote" 
     	            , null );
     		  if(cursor.moveToFirst()==false){
+    				System.out.println("第一步");
     			  return true;
     		  };
-    		  while(cursor.moveToNext())
-    		  {
-    			  System.out.println(cursor.getString(cursor.getColumnIndex("NAME")));
+    		 
+    		  do{
+    			  System.out.println("第二步");
+    			System.out.println(cursor.getString(cursor.getColumnIndex("NAME")));
     	        result = (cursor.getString(cursor.getColumnIndex("NAME")).equals(Codename) );
     	        if(result==true)
     	        {
     	        	break;
     	        	}
     	        
-    		  }
+    		  } while(cursor.moveToNext());
     	 return !result;
     }
     

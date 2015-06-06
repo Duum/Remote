@@ -60,6 +60,7 @@ public class CodeClass {  //注意这个不会对数据库操作
    	for (String key : CodeValue.keySet()) {
    		cv.put(key, CodeValue.get(key));
    	}
+   //	System.out.println(mHelper.isNotExist(db,CodeName));
     if(mHelper.isNotExist(db,CodeName))
 	   {
     	cv.put("NAME",CodeName);
@@ -80,7 +81,7 @@ public class CodeClass {  //注意这个不会对数据库操作
   		
   		Toast toast=Toast.makeText( mContext, "开始学习"+Codename+"键",
  			     Toast.LENGTH_SHORT);
-  		toast.setGravity(Gravity.TOP, 0, 0);
+  		toast.setGravity(Gravity.TOP, 0,100 );
   		toast.show();
     }
     //下面的三个函数分别可以实现，加码头，判断是否为接受码头，去码头，三个编码函数
@@ -106,13 +107,15 @@ public class CodeClass {  //注意这个不会对数据库操作
     }
 	 public static boolean isReceiveRight(byte[] data)//判断接收的码头是否正常
 	 {
-		 int a=(int)(data[0]+16*16*data[1]+8);
-		 if (a<0){
-			 a=256+a;
-		 }			
-		if(data.length==a)
+		int a= ((int)data[1]<< 8)|((int)data[0] & 0xFF);
+		System.out.println(data.length);
+		System.out.println(a);
+		System.out.println("数据长度");
+		if(data.length==a+8&&data[data.length-1]==(byte)0x0f&&data[data.length-2]==(byte)0xa0)
 			{
+			
 			return true;
+			
 			}else{
 	
 			return false;

@@ -1,0 +1,8 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}This is a basic introduction}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}Class diagram}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}Work flow}{4}{section.1.2}
+\contentsline {chapter}{\numberline {2}This is a introduction of how to extend the app (add button)}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}client.xml}{7}{section.2.1}
+\contentsline {section}{\numberline {2.2}the process of add button}{10}{section.2.2}
+\contentsline {section}{\numberline {2.3}Waring:}{11}{section.2.3}

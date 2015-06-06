@@ -80,12 +80,13 @@ public class MainActivity extends Activity {
 	private Spinner NameSpinner; //下拉选框
 	private String NameSpinId;
 	private TextView StatePrompt;
+	private Toast currentToast;
 	
 	//这个输入框被要求输入新的遥控器名称，这个引用不应该发生变化所以设为final
 	private String newCodename;//用来存储新遥控器的名称
 	private Map<String,byte[]> newCodevalue;//
 	private byte ReadFlag=1;
-	
+	private byte hasRead=0;
 	AlertDialog.Builder builder;
 	public  ArrayAdapter<String> NameAdapter;
 	public ArrayList<String> allCodeName;//用来存储目前已经存在的红外编码名
@@ -120,6 +121,7 @@ public class MainActivity extends Activity {
 		IntentFilter filter = new IntentFilter();    
 		filter.addAction("RECRIVE_ENABLE");//准备接收
 		filter.addAction("RECRIVECOMPELETE");//接收完毕
+		filter.addAction("RECRIVE_ERROR");//接收出现错误
 		registerReceiver(ViewandDataReceiver, filter);
 		
 		//注意这里的Serial是消息驱动，只有给它消息，它才会知行相应的收发动作
@@ -165,8 +167,7 @@ public class MainActivity extends Activity {
         {
           	public void onClick(View v){
           		if(allCodeName.isEmpty()){
-          			Toast.makeText(MainActivity.this, "无码可删",
-            			     Toast.LENGTH_SHORT).show();
+          			 showToast("无码可删");
           		}
           		else{
           			new AlertDialog.Builder(MainActivity.this).setTitle("确定要删").setIcon(
@@ -209,23 +210,20 @@ public class MainActivity extends Activity {
                     		if (allCodeName.indexOf(newCodename)==-1)
                     		{
                     		
-                      		Toast.makeText(MainActivity.this, "开启学习模式，请您选择要学习的按键",
-                      			     Toast.LENGTH_SHORT).show();
+                    			 showToast("开启学习模式，请您选择要学习的按键");
                       		   WorkMode=1;//切换工作模式为修改模式
                       		 newCodevalue=new HashMap<String,byte[]>();
                       		StatePrompt.setText("正在学习遥控器:"+newCodename+",请逐个单击要学习的按键"+"学习完毕后点击完毕");
                       		// msgService.receiveCodevalue=new HashMap<String,byte[]>();
                     		}
                     		else{
-                    			Toast.makeText(MainActivity.this, "名称有重复，请重新输入",
-                         			     Toast.LENGTH_SHORT).show();
+                    			 showToast( "名称有重复，请重新输入");
                     			
                     		}
                     	}
 						
                       		else{
-                      			Toast.makeText(MainActivity.this, "输入的名称为空,未进入学习模式",
-                         			     Toast.LENGTH_SHORT).show();
+                      			 showToast("输入的名称为空,未进入学习模式");
                       		}
                        
                     }}).setNegativeButton("取消", null).show(); 
@@ -242,16 +240,17 @@ public class MainActivity extends Activity {
           	    	 intent.setAction("INTERRUPT"); 
                     sendBroadcast(intent);  
           	        ReadFlag=1;
-          	     
+          	      System.out.println("hasRead");
+          	     System.out.println(hasRead);
           	      Toast.makeText(MainActivity.this, "学习被中断",
               			 Toast.LENGTH_LONG).show();
-          		}else if(ReadFlag==2){
-          			
+          		} 
+          		if(ReadFlag==2||hasRead==1){
+          			 System.out.println("进入了完成遥控器");
           			if(WorkMode==2){
           				 MyCodeClass=MyControl.CreaeCodeClass(newCodename,newCodevalue,null);
                    	  MyCodeClass.CommitDB();
-                   	Toast.makeText(MainActivity.this, "修改完毕",
-              			     Toast.LENGTH_SHORT).show();    
+                   	 showToast( "修改完毕");    
                  	  ReadFlag=1;
           			}
           			else if(WorkMode==1)
@@ -262,8 +261,7 @@ public class MainActivity extends Activity {
                 	  //NameSpinner.removeAllViews();
                 	//  NameAdapter.add(newCodename);这里要好好看看
                 	  NameSpinner.setSelection(allCodeName.indexOf(newCodename));
-                	  Toast.makeText(MainActivity.this, "学习完毕，您可以选择刚创建的遥控器了",
-               			     Toast.LENGTH_SHORT).show();    
+                	  showToast("学习完毕，您可以选择刚创建的遥控器了");
                 	  ReadFlag=1;
           			}
           		}
@@ -275,6 +273,7 @@ public class MainActivity extends Activity {
                  
                  enableDisableView(buttofield,true);
           		 WorkMode=0;
+          		hasRead=0;
           		StatePrompt.setText("");
           	}
           });
@@ -451,22 +450,34 @@ public class MainActivity extends Activity {
  				{
  					ReadFlag=0;
  					enableDisableView(buttofield,false);
- 					  Toast.makeText(MainActivity.this, "请将遥控器对准红外接收口按下相应按键",
-                			     Toast.LENGTH_SHORT).show();     
+ 					 showToast("请将遥控器对准红外接收口按下相应按键");
  					
  				}else if(Action.equals("RECRIVECOMPELETE")){
  					enableDisableView(buttofield,true);
  					String codeName=intent.getStringExtra("codename");
  				byte[] codeValueValue = intent.getByteArrayExtra("codevalue");
  				  newCodevalue.put(codeName, codeValueValue);
- 					 Toast.makeText(MainActivity.this,  codeName+"键,学习完毕",
-            			     Toast.LENGTH_SHORT).show();  
+ 				 showToast(codeName+"键,学习完毕");
+            			    
  					ReadFlag=2;
+ 					hasRead=1;
+ 				}
+ 				else if(Action.equals("RECRIVE_ERROR")){
+ 					 showToast("解码错误请重试");
  				}
  				// TODO Auto-generated method stub
  				
  			}};
   	
+  	void showToast(String text){
+  		
+  		if(currentToast==null){
+  			currentToast=Toast.makeText(this, text, Toast.LENGTH_SHORT);
+  		}
+  		   currentToast.setText(text);
+  		    currentToast.setDuration(Toast.LENGTH_LONG);
+  		   currentToast.show();
+  		}
   	
   	
 	@Override

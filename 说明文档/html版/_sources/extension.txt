@@ -1,0 +1,192 @@
+This is a introduction of how to  extend the app (add button)
+===============
+The remote Android App  is a complement  demo of cms' FPGA remote IR Remote Controller.It's extensible and convenient. User can directly use it for  most scenes, but we also  provide APIs for user to develope some special remote or just use Android device‘s UART.
+this page will show you the Processes and considerations when you extend this app.
+
+client.xml
+----------------
+.. image:: _static/interface.jpg
+.. highlight:: xml
+1. This is the *remote button code* part,you can add your remote button among them. we recommand adding *imagebutton* which will auto include click effects.
+
+.. image:: _static/remotebutton.jpg
+.. code-block:: xml
+
+         <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonfield">"
+            <ImageButton
+                android:id="@+id/power"
+                android:layout_width="40dip"
+                android:layout_height="40dip"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="40dip"
+                android:layout_marginTop="20dip"
+                android:background="@drawable/power" />
+            <ImageButton
+                android:id="@+id/cli1"
+                android:layout_width="40dip"
+                android:layout_height="40dip"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/power"
+                android:layout_marginLeft="40dip"
+                android:layout_marginTop="10dip"
+                android:background="@drawable/cli1" />
+            <ImageButton
+                android:id="@+id/cli2"
+                android:layout_width="40dip"
+                android:layout_height="40dip"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/power"
+                android:layout_marginRight="40dip"
+                android:background="@drawable/cli2" />
+
+            <ImageButton
+                android:id="@+id/volume_add"
+                android:layout_width="65dip"
+                android:layout_height="65dip"
+                android:layout_below="@+id/cli1"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/valume_add" />
+
+            <ImageButton
+                android:id="@+id/play"
+                android:layout_width="65dip"
+                android:layout_height="65dip"
+                android:layout_alignLeft="@+id/volup"
+                android:layout_below="@+id/volume_add"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="10dip"
+                android:background="@drawable/center" />
+
+            <ImageButton
+                android:id="@+id/prev"
+                android:layout_width="65dip"
+                android:layout_height="65dip"
+                android:layout_alignLeft="@+id/cli1"
+                android:layout_alignTop="@+id/play"
+                android:layout_below="@+id/volume_add"
+                android:background="@drawable/prev" />
+
+            <ImageButton
+                android:id="@+id/next"
+                android:layout_width="65dip"
+                android:layout_height="65dip"
+                android:layout_alignRight="@+id/cli2"
+                android:layout_alignTop="@+id/play"
+                android:background="@drawable/next" />
+
+            <ImageButton
+                android:id="@+id/volume_down"
+                android:layout_width="65dip"
+                android:layout_height="65dip"
+                android:layout_alignLeft="@+id/play"
+                android:layout_below="@+id/play"
+                android:layout_marginTop="10dip"
+                android:background="@drawable/volume_down" />
+        </RelativeLayout>
+2. This is the *command button code* part. We do not recommend changing this part.
+
+.. image:: _static/command.jpg
+.. code-block:: xml
+       
+          <RelativeLayout
+            android:id="@+id/relate_level1"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" 
+            android:layout_marginTop="40dp">
+         <Button
+             android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="20dp"
+              android:id="@+id/study"
+             android:text="学习"/>
+         <Button
+             android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_toRightOf="@id/study"
+              android:id="@+id/edit"
+             android:text="修改"/>  
+          <Button
+             android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_toRightOf="@id/edit"
+              android:id="@+id/studyover"
+             android:text="完毕"/>  
+
+             <Button
+                 android:id="@+id/delete"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_toRightOf="@id/studyover"
+                 android:text="删除编码" />
+                           
+        </RelativeLayout>
+
+
+
+the process of  add button 
+-------------
+there are only six remote button in the demo,you can add your button conveniently, Here's an example of adding  remote button *MUTE*
+
+1. Add a Imagebutton in the xml, Attention: you need a button named mute in the drawer folder 
+
+.. code-block:: xml
+
+   <ImageButton
+                android:id="@+id/mute"
+                android:layout_width="40dip"
+                android:layout_height="40dip"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/power"
+                android:layout_marginLeft="40dip"
+                android:layout_marginTop="10dip"
+                android:background="@drawable/mute" />
+
+.. highlight::java
+2. Add a Imagebutton declaration in the Mainactivity
+
+.. code-block:: java
+
+	private ImageButton mute;
+	volume_up=(ImageButton)findViewById(R.id.mute);
+3. Set a cliklistener for the Imagebutton
+
+.. code-block:: java
+
+	mute.setOnClickListener(new OnClickListener(){
+				@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(WorkMode==0){
+			
+					MyCodeClass.SendData("MUTE");
+				}else
+				{
+			    	CodeClass.ReceiveData("MUTE"); 
+			    
+				
+			       	
+				}
+			}			
+	 });
+There are a few things to Attention
+
+ #. You can redesign the interface  following your favorite style.
+ #. wo don't recommended that you change the ID of the views,becasue most of them are bound in the Mainactivity.   
+
+Waring:
+------
+
+Currently the keywords supported by the sqllite are listed below:
+
+"NUM1"（数字键）,"NUM2","NUM3","NUM4","NUM5","NUM6","NUM7","NUM9","NUM0","PAUSE"(暂停),"LIKE"（喜爱） ,"SINALSOURCE" （切换信号源）,"SLEEP"（睡眠）,"MENU","MUTE（静音）", "OK","POWER"（电源键）,"PLAY","PRE","NEXT","VOLUME_DOWN","VOLUME_UP" };
+
+There are a few things to Attention:
+
+ #. Keywords there has no capacity constraints, eg.you can learn your reality remote mute button on the "POWER" or other keywordes.
+ #. wo don't recommended that you change the ID of the views,becasue most of them are bound in the Mainactivity.
